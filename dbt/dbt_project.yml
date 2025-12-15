@@ -1,0 +1,37 @@
+# DBT Project Configuration
+name: 'football_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'football_analytics'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configuraties per folder
+models:
+  football_analytics:
+    # Silver layer - cleaned data
+    silver:
+      +schema: silver
+      +materialized: table
+      +tags: ['silver']
+
+    # Gold layer - aggregated business views
+    gold:
+      +schema: gold
+      +materialized: table
+      +tags: ['gold']
+
+# Variables
+vars:
+  bronze_database: football_data
+  bronze_schema: bronze

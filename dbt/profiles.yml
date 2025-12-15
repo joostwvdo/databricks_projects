@@ -1,0 +1,23 @@
+# DBT Profiles - Databricks Connection
+# Dit bestand kan ook in ~/.dbt/profiles.yml staan
+
+football_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: football_data
+      schema: dbt_dev
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 4
+
+    prod:
+      type: databricks
+      catalog: football_data
+      schema: dbt_prod
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 8

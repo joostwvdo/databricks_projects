@@ -1,0 +1,315 @@
+version: 2
+
+models:
+  - name: stg_matches
+    description: "Cleaned and standardized match data with SCD Type 2 history"
+    columns:
+      - name: match_version_key
+        description: "Unique key for this version of the match record"
+        tests:
+          - unique
+          - not_null
+
+      - name: match_id
+        description: "Unique match identifier"
+        tests:
+          - not_null
+
+      - name: match_datetime
+        description: "Match date and time"
+        tests:
+          - not_null
+
+      - name: match_status
+        description: "Current match status"
+        tests:
+          - accepted_values:
+              values: ['SCHEDULED', 'TIMED', 'IN_PLAY', 'PAUSED', 'FINISHED', 'SUSPENDED', 'POSTPONED', 'CANCELLED', 'AWARDED']
+
+      - name: competition_code
+        description: "Competition identifier code"
+        tests:
+          - not_null
+
+      - name: home_team_id
+        description: "Home team identifier"
+        tests:
+          - not_null
+
+      - name: away_team_id
+        description: "Away team identifier"
+        tests:
+          - not_null
+
+      - name: match_result
+        description: "Match result (HOME, AWAY, DRAW)"
+        tests:
+          - accepted_values:
+              values: ['HOME', 'AWAY', 'DRAW']
+              config:
+                where: "is_finished = TRUE AND is_current = TRUE"
+
+      - name: record_hash
+        description: "MD5 hash of record content for change detection"
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp when this version became active"
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "Timestamp when this version was superseded (NULL if current)"
+
+      - name: is_current
+        description: "Flag indicating if this is the current active version"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: stg_teams
+    description: "Cleaned and deduplicated team data with SCD Type 2 history"
+    columns:
+      - name: team_version_key
+        description: "Unique key for this version of the team record"
+        tests:
+          - unique
+          - not_null
+
+      - name: team_id
+        description: "Unique team identifier"
+        tests:
+          - not_null
+
+      - name: team_name
+        description: "Full team name"
+        tests:
+          - not_null
+
+      - name: team_code
+        description: "Three-letter team code"
+
+      - name: record_hash
+        description: "MD5 hash for change detection"
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp when this version became active"
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "Timestamp when this version was superseded"
+
+      - name: is_current
+        description: "Flag indicating if this is the current active version"
+        tests:
+          - not_null
+
+  - name: stg_fbref_matches
+    description: "Cleaned match data from FBref with xG statistics and SCD Type 2 history"
+    columns:
+      - name: match_version_key
+        description: "Unique key for this version of the match record"
+        tests:
+          - unique
+          - not_null
+
+      - name: match_key
+        description: "Surrogate key for the match"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Name of the competition"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Eredivisie', 'Premier League', 'La Liga', 'Serie A']
+
+      - name: home_xg
+        description: "Expected goals for home team"
+
+      - name: away_xg
+        description: "Expected goals for away team"
+
+      - name: record_hash
+        description: "MD5 hash for change detection"
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp when this version became active"
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "Timestamp when this version was superseded"
+
+      - name: is_current
+        description: "Flag indicating if this is the current active version"
+        tests:
+          - not_null
+
+  - name: stg_fbref_standings
+    description: "Cleaned standings from FBref with xG metrics and SCD Type 2 history"
+    columns:
+      - name: standing_version_key
+        description: "Unique key for this version of the standing record"
+        tests:
+          - unique
+          - not_null
+
+      - name: standing_key
+        description: "Surrogate key for the standing"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Name of the competition"
+        tests:
+          - not_null
+
+      - name: team_name
+        description: "Team name"
+        tests:
+          - not_null
+
+      - name: xg
+        description: "Total expected goals scored"
+
+      - name: xga
+        description: "Total expected goals conceded"
+
+      - name: record_hash
+        description: "MD5 hash for change detection"
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp when this version became active"
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "Timestamp when this version was superseded"
+
+      - name: is_current
+        description: "Flag indicating if this is the current active version"
+        tests:
+          - not_null
+
+  - name: stg_players
+    description: "Cleaned player statistics with SCD Type 2 history for tracking performance changes"
+    columns:
+      - name: player_version_key
+        description: "Unique key for this version of the player record"
+        tests:
+          - unique
+          - not_null
+
+      - name: player_season_key
+        description: "Business key for player-season combination"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: team_name
+        description: "Current team"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Competition name"
+        tests:
+          - not_null
+
+      - name: position_category
+        description: "Categorized position (Forward, Midfielder, Defender, Goalkeeper)"
+        tests:
+          - accepted_values:
+              values: ['Forward', 'Midfielder', 'Defender', 'Goalkeeper', 'Unknown']
+
+      - name: goals
+        description: "Goals scored"
+
+      - name: assists
+        description: "Assists provided"
+
+      - name: xg
+        description: "Expected goals"
+
+      - name: xa
+        description: "Expected assists"
+
+      - name: record_hash
+        description: "MD5 hash of all stats for change detection"
+        tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp when this version became active"
+        tests:
+          - not_null
+
+      - name: valid_to
+        description: "Timestamp when this version was superseded"
+
+      - name: is_current
+        description: "Flag indicating if this is the current active version"
+        tests:
+          - not_null
+
+  - name: stg_players
+    description: "Cleaned and standardized player statistics from FBref"
+    columns:
+      - name: player_season_key
+        description: "Surrogate key for player-season-competition"
+        tests:
+          - unique
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: team_name
+        description: "Current team"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Competition name"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Eredivisie', 'Premier League', 'La Liga', 'Serie A']
+
+      - name: position_category
+        description: "Categorized position"
+        tests:
+          - accepted_values:
+              values: ['Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Unknown']
+
+      - name: goals
+        description: "Goals scored"
+
+      - name: assists
+        description: "Assists"
+
+      - name: xg
+        description: "Expected goals"
+
+      - name: xa
+        description: "Expected assists"
+
+      - name: goals_minus_xg
+        description: "Goals over/under expected"

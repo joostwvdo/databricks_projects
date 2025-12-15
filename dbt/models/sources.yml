@@ -1,0 +1,94 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Bronze layer - Raw football data from multiple sources"
+    database: "{{ var('bronze_database') }}"
+    schema: "{{ var('bronze_schema') }}"
+
+    tables:
+      - name: matches
+        description: "Raw match data from Football-Data.org API"
+        columns:
+          - name: match_id
+            description: "Unique identifier for the match"
+            tests:
+              - not_null
+          - name: utc_date
+            description: "Match date and time in UTC"
+          - name: status
+            description: "Match status (SCHEDULED, LIVE, FINISHED, etc.)"
+          - name: competition_code
+            description: "Competition code (DED, PL, PD, SA)"
+          - name: home_team_id
+            description: "Home team ID"
+          - name: away_team_id
+            description: "Away team ID"
+
+      - name: teams
+        description: "Team information including name, venue, and metadata"
+        columns:
+          - name: team_id
+            description: "Unique identifier for the team"
+            tests:
+              - not_null
+          - name: team_name
+            description: "Full team name"
+          - name: short_name
+            description: "Short team name"
+          - name: competition_id
+            description: "Competition the team plays in"
+
+      - name: fbref_matches
+        description: "Raw match data from FBref with xG statistics"
+        columns:
+          - name: competition_name
+            description: "Name of the competition"
+          - name: match_date
+            description: "Date of the match"
+          - name: home_team_name
+            description: "Home team name"
+          - name: away_team_name
+            description: "Away team name"
+          - name: home_xg
+            description: "Expected goals for home team"
+          - name: away_xg
+            description: "Expected goals for away team"
+
+      - name: fbref_standings
+        description: "League standings from FBref with xG data"
+        columns:
+          - name: competition_name
+            description: "Name of the competition"
+          - name: position
+            description: "Current position in the league"
+          - name: team_name
+            description: "Team name"
+          - name: points
+            description: "Total points"
+          - name: xg
+            description: "Total expected goals"
+          - name: xga
+            description: "Total expected goals against"
+
+      - name: player_stats
+        description: "Player statistics from FBref including goals, assists, xG, shooting, passing, and defensive stats"
+        columns:
+          - name: player_name
+            description: "Player's full name"
+          - name: team_name
+            description: "Current team"
+          - name: competition_name
+            description: "Competition name"
+          - name: position
+            description: "Player position"
+          - name: goals
+            description: "Goals scored"
+          - name: assists
+            description: "Assists"
+          - name: xg
+            description: "Expected goals"
+          - name: xa
+            description: "Expected assists"
+          - name: minutes
+            description: "Minutes played"

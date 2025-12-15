@@ -1,0 +1,402 @@
+version: 2
+
+models:
+  - name: fct_match_results
+    description: "Fact table with complete match results and calculated metrics"
+    columns:
+      - name: match_id
+        description: "Unique match identifier"
+        tests:
+          - unique
+          - not_null
+
+      - name: match_date
+        description: "Date of the match"
+        tests:
+          - not_null
+
+      - name: competition_code
+        description: "Competition code"
+        tests:
+          - not_null
+
+      - name: home_team_id
+        description: "Home team identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_teams')
+              field: team_id
+
+      - name: away_team_id
+        description: "Away team identifier"
+        tests:
+          - not_null
+
+      - name: home_points
+        description: "Points earned by home team (3=win, 1=draw, 0=loss)"
+        tests:
+          - accepted_values:
+              values: [0, 1, 3]
+
+      - name: away_points
+        description: "Points earned by away team"
+        tests:
+          - accepted_values:
+              values: [0, 1, 3]
+
+  - name: dim_teams
+    description: "Team dimension with aggregated statistics"
+    columns:
+      - name: team_id
+        description: "Unique team identifier"
+        tests:
+          - unique
+          - not_null
+
+      - name: team_name
+        description: "Full team name"
+        tests:
+          - not_null
+
+      - name: total_points
+        description: "Total points earned across all matches"
+
+      - name: points_per_game
+        description: "Average points per game"
+
+  - name: agg_competition_standings
+    description: "Current standings per competition"
+    columns:
+      - name: position
+        description: "Current position in the table"
+        tests:
+          - not_null
+
+      - name: team_id
+        description: "Team identifier"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Name of the competition"
+        tests:
+          - not_null
+
+      - name: points
+        description: "Total points"
+        tests:
+          - not_null
+
+  - name: agg_matchday_summary
+    description: "Aggregated statistics per matchday"
+    columns:
+      - name: competition_code
+        description: "Competition code"
+        tests:
+          - not_null
+
+      - name: matchday_number
+        description: "Matchday number"
+        tests:
+          - not_null
+
+      - name: total_matches
+        description: "Number of matches played"
+        tests:
+          - not_null
+
+  - name: fct_matches_with_xg
+    description: "Combined match results from API and FBref with xG data"
+    columns:
+      - name: match_id
+        description: "Unique match identifier"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Name of the competition"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Eredivisie', 'Premier League', 'La Liga', 'Serie A']
+
+      - name: home_xg
+        description: "Expected goals for home team (from FBref)"
+
+      - name: away_xg
+        description: "Expected goals for away team (from FBref)"
+
+  - name: agg_team_xg_analysis
+    description: "Team performance analysis comparing actual goals vs expected goals"
+    columns:
+      - name: team_name
+        description: "Team name"
+        tests:
+          - not_null
+
+      - name: competition_name
+        description: "Competition name"
+        tests:
+          - not_null
+
+      - name: total_xg
+        description: "Total expected goals"
+
+      - name: goals_vs_xg
+        description: "Difference between actual goals and xG (positive = overperforming)"
+
+      - name: luck_index
+        description: "Combined over/under performance metric"
+
+      - name: finishing_quality
+        description: "Categorical assessment of finishing quality"
+        tests:
+          - accepted_values:
+              values: ['Elite Finishing', 'Good Finishing', 'Average Finishing', 'Below Average Finishing', 'Poor Finishing']
+
+  - name: dim_players
+    description: "Player dimension with complete profiles and current season stats"
+    columns:
+      - name: player_key
+        description: "Surrogate key for player"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: current_team
+        description: "Current team"
+
+      - name: position_category
+        description: "Categorized position (Forward, Midfielder, Defender, Goalkeeper)"
+
+      - name: player_type
+        description: "Player classification based on stats"
+
+      - name: finishing_quality
+        description: "Assessment of finishing vs xG"
+
+  - name: fct_player_performance
+    description: "Detailed player performance metrics per season/competition"
+    columns:
+      - name: player_season_key
+        description: "Unique identifier for player-season record"
+        tests:
+          - unique
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: goals
+        description: "Goals scored"
+
+      - name: assists
+        description: "Assists"
+
+      - name: xg
+        description: "Expected goals"
+
+      - name: performance_score
+        description: "Calculated performance rating based on position"
+
+  - name: agg_top_scorers
+    description: "Top goal scorers ranking per competition"
+    columns:
+      - name: rank_in_competition
+        description: "Rank within the competition"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: goals
+        description: "Goals scored"
+        tests:
+          - not_null
+
+      - name: golden_boot_status
+        description: "Golden Boot race indicator"
+
+  - name: agg_top_assisters
+    description: "Top assist providers ranking per competition"
+    columns:
+      - name: rank_in_competition
+        description: "Rank within the competition"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: assists
+        description: "Assists"
+
+      - name: playmaker_status
+        description: "Playmaker classification"
+
+  - name: agg_player_xg_analysis
+    description: "Detailed xG analysis per player - comparing actual vs expected performance"
+    columns:
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: goals_minus_xg
+        description: "Goals scored minus expected goals"
+
+      - name: finishing_category
+        description: "Classification based on finishing vs xG"
+        tests:
+          - accepted_values:
+              values: ['Elite Finisher', 'Clinical', 'On Par', 'Slightly Wasteful', 'Underperforming']
+
+      - name: skill_luck_index
+        description: "Combined index measuring over/underperformance"
+
+  - name: agg_head_to_head
+    description: "Head-to-head analysis between teams with historical matchup statistics"
+    columns:
+      - name: h2h_key
+        description: "Unique key for head-to-head record"
+        tests:
+          - not_null
+
+      - name: team_a
+        description: "First team (alphabetically sorted)"
+        tests:
+          - not_null
+
+      - name: team_b
+        description: "Second team (alphabetically sorted)"
+        tests:
+          - not_null
+
+      - name: perspective_team
+        description: "Team from whose perspective stats are shown"
+        tests:
+          - not_null
+
+      - name: total_matches
+        description: "Total matches played between the teams"
+
+      - name: wins
+        description: "Wins for perspective team"
+
+      - name: draws
+        description: "Draws between teams"
+
+      - name: losses
+        description: "Losses for perspective team"
+
+      - name: h2h_dominance
+        description: "Indicator of dominance in head-to-head"
+        tests:
+          - accepted_values:
+              values: ['Dominant', 'Slight Edge', 'Even', 'Slight Disadvantage', 'Inferior']
+
+  - name: agg_team_form
+    description: "Recent form analysis based on last 5 matches per team"
+    columns:
+      - name: form_key
+        description: "Unique key for form record"
+        tests:
+          - unique
+          - not_null
+
+      - name: team_name
+        description: "Team name"
+        tests:
+          - not_null
+
+      - name: form_string
+        description: "Last 5 results string (e.g., WWDLW)"
+
+      - name: form_points
+        description: "Points from last 5 matches"
+
+      - name: form_ppg
+        description: "Points per game in form period"
+
+      - name: form_rating
+        description: "Categorical form assessment"
+        tests:
+          - accepted_values:
+              values: ['🔥 Excellent', '✅ Good', '➡️ Average', '⚠️ Poor', '❌ Very Poor']
+
+      - name: form_trend
+        description: "Current trend indicator"
+        tests:
+          - accepted_values:
+              values: ['Hot Streak', 'Cold Streak', 'Drawing Habit', 'Mixed']
+
+  - name: agg_player_form
+    description: "Player form analysis comparing current vs previous statistics snapshots"
+    columns:
+      - name: player_season_key
+        description: "Unique player-season identifier"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player's full name"
+        tests:
+          - not_null
+
+      - name: recent_goals
+        description: "Goals scored since last update"
+
+      - name: recent_assists
+        description: "Assists since last update"
+
+      - name: current_form
+        description: "Current form indicator"
+        tests:
+          - accepted_values:
+              values: ['🔥 Hot', '✅ Good Form', '🪑 Limited Minutes', '📉 Cold', '➡️ Steady']
+
+      - name: is_on_hot_streak
+        description: "Flag for players on a hot scoring streak"
+
+  - name: agg_standing_history
+    description: "Historical standing positions tracking team movement through the season"
+    columns:
+      - name: history_key
+        description: "Unique key for history record"
+        tests:
+          - unique
+          - not_null
+
+      - name: team_name
+        description: "Team name"
+        tests:
+          - not_null
+
+      - name: position
+        description: "Position at this snapshot"
+        tests:
+          - not_null
+
+      - name: position_change
+        description: "Change in position from previous snapshot"
+
+      - name: position_movement
+        description: "Human-readable position movement indicator"
+
+      - name: table_zone
+        description: "Zone in the table (Champions League, Europa League, Relegation, etc.)"
+        tests:
+          - accepted_values:
+              values: ['Champions League Zone', 'Europa League Zone', 'Conference League Zone', 'Mid-table', 'Relegation Battle', 'Relegation Zone']
