@@ -1,6 +1,25 @@
 # Databricks Voetbal Data Project
 
-Dit project haalt voetbalwedstrijden op en verwerkt deze via een medallion architectuur (Bronze → Silver → Gold) met DBT transformaties.
+Dit project haalt voetbalwedstrijden op en verwerkt deze via een medallion architectuur (Bronze → Silver → Gold) in Databricks.
+
+## 🚀 Quick Start in Databricks
+
+### 1. Open Databricks Workspace
+Ga naar: https://dbc-63b440bb-027b.cloud.databricks.com/
+
+### 2. Navigeer naar de notebooks
+📁 **Locatie**: `/Shared/football_data/`
+
+### 3. Start een cluster
+- Ga naar **Compute** → Start je cluster
+- Wacht tot status "Running" is
+
+### 4. Run de pipeline
+Open `00_run_all` en klik **Run All** - dit voert automatisch uit:
+1. Setup catalog en schemas
+2. Bronze: Data ophalen van API
+3. Silver: Transformaties
+4. Gold: Aggregaties
 
 ## 📁 Project Structuur
 
