@@ -28,19 +28,11 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 3. Silver Layer - Transform
+# MAGIC ## 3. Silver Layer - SCD-2 Transform
 
 # COMMAND ----------
 
-# MAGIC %run ./04_silver_transform_matches
-
-# COMMAND ----------
-
-# MAGIC %run ./05_silver_transform_teams
-
-# COMMAND ----------
-
-# MAGIC %run ./06_silver_transform_standings
+# MAGIC %run ./04_silver_scd2_processor
 
 # COMMAND ----------
 
@@ -66,7 +58,16 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 5. Samenvatting
+# MAGIC ## 5. Data Quality Report
+
+# COMMAND ----------
+
+# MAGIC %run ./11_dbt_data_quality
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 6. Samenvatting
 
 # COMMAND ----------
 
@@ -89,7 +90,7 @@ for schema in ["bronze", "silver", "gold"]:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 6. Quick Stats
+# MAGIC ## 7. Quick Stats
 
 # COMMAND ----------
 
